@@ -21,7 +21,7 @@ const BASE_URL = `https://api.nasa.gov/insight_weather/?`
 let cachedData
 let cacheTime
 
-router.get('/', speedLImiter, limiter, async (req, res, next) => {
+router.get('/', limiter, speedLImiter, async (req, res, next) => {
   if (cacheTime && cacheTime > Date.now() - 30 * 1000) {
     return res.json(cachedData)
   }
