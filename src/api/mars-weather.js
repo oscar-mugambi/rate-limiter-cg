@@ -1,5 +1,11 @@
 const express = require('express')
 const axios = require('axios')
+const rateLimit = require('express-rate-limit')
+
+const limiter = rateLimit({
+  windowMs: 30 * 1000,
+  max: 2,
+})
 const router = express.Router()
 
 const BASE_URL = `https://api.nasa.gov/insight_weather/?`
@@ -7,7 +13,7 @@ const BASE_URL = `https://api.nasa.gov/insight_weather/?`
 let cachedData
 let cacheTime
 
-router.get('/', async (req, res, next) => {
+router.get('/', limiter, async (req, res, next) => {
   if (cacheTime && cacheTime > Date.now() - 30 * 1000) {
     return res.json(cachedData)
   }
@@ -22,7 +28,7 @@ router.get('/', async (req, res, next) => {
 
     cachedData = data
     cacheTime = Date.now()
-    console.log(`${BASE_URL}${params}`)
+    data.cacheTime = cacheTime
     res.json(data)
   } catch (error) {
     next(error)
